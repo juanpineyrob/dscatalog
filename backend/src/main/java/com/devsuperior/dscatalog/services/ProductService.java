@@ -1,11 +1,10 @@
 package com.devsuperior.dscatalog.services;
 
-import com.devsuperior.dscatalog.dtos.CategoryDTO;
-import com.devsuperior.dscatalog.entities.Category;
-import com.devsuperior.dscatalog.repositories.CategoryRepository;
+import com.devsuperior.dscatalog.dtos.ProductDTO;
+import com.devsuperior.dscatalog.entities.Product;
+import com.devsuperior.dscatalog.repositories.ProductRepository;
 import com.devsuperior.dscatalog.services.exceptions.DatabaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
-
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,39 +17,39 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
-public class CategoryService {
+public class ProductService {
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private ProductRepository productRepository;
 
     @Transactional(readOnly = true)
-    public Page<CategoryDTO> findAll(PageRequest pageRequest) {
-        Page<Category> categories = categoryRepository.findAll(pageRequest);
-        return categories.map(CategoryDTO::new);
+    public Page<ProductDTO> findAll(PageRequest pageRequest) {
+        Page<Product> products = productRepository.findAll(pageRequest);
+        return products.map(ProductDTO::new);
     }
 
     @Transactional(readOnly = true)
-    public CategoryDTO findById(Long id) {
-        Optional<Category> obj = categoryRepository.findById(id);
-        Category category = obj.orElseThrow(() -> new ResourceNotFoundException("No se encontro el objeto"));
-        return new CategoryDTO(category);
+    public ProductDTO findById(Long id) {
+        Optional<Product> obj = productRepository.findById(id);
+        Product product = obj.orElseThrow(() -> new ResourceNotFoundException("No se encontro el objeto"));
+        return new ProductDTO(product, product.getCategories());
     }
 
     @Transactional
-    public CategoryDTO insert(CategoryDTO categoryDTO) {
-        Category category = new Category();
-        category.setName(categoryDTO.getName());
-        category = categoryRepository.save(category);
-        return new CategoryDTO(category);
+    public ProductDTO insert(ProductDTO productDTO) {
+        Product product = new Product();
+        product.setName(productDTO.getName());
+        product = productRepository.save(product);
+        return new ProductDTO(product);
     }
 
     @Transactional
-    public CategoryDTO update(Long id, CategoryDTO categoryDTO) {   
+    public ProductDTO update(Long id, ProductDTO productDTO) {
         try {
-            Category category = categoryRepository.getReferenceById(id);
-            category.setName(categoryDTO.getName());
-            category = categoryRepository.save(category);
-            return new CategoryDTO(category);
+            Product product = productRepository.getReferenceById(id);
+            product.setName(productDTO.getName());
+            product = productRepository.save(product);
+            return new ProductDTO(product);
         }
         catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException("No se encontro el id " + id);
@@ -59,11 +58,11 @@ public class CategoryService {
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public void delete(Long id) {
-        if(!categoryRepository.existsById(id)) {
+        if(!productRepository.existsById(id)) {
             throw new ResourceNotFoundException("No se encontro el id " + id);
         }
         try {
-            categoryRepository.deleteById(id);
+            productRepository.deleteById(id);
         }
         catch(DataIntegrityViolationException e) {
             throw new DatabaseException("Falla en la integridad referencial");
