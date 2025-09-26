@@ -10,5 +10,4 @@ class DscatalogApplicationTests {
 	void contextLoads() {
 	}
 
-
 }
