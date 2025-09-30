@@ -13,6 +13,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class FieldMessage {
 
-    private String fieldMessage;
+    private String fieldName;
     private String message;
 }
