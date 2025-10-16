@@ -17,7 +17,7 @@ import java.util.Set;
 @Setter
 @EqualsAndHashCode(of = "id")
 @Table(name = "tb_user")
-public class User extends UserDetails {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
